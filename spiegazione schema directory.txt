@@ -1,0 +1,22 @@
+PROGETTO_ECOMMERCE/
+├── api/                        # [LOGIC] Entry point per il protocollo HTTP
+│   └── prodotti.php            # Controller che smista le richieste (GET, POST, PUT, DELETE)
+├── assets/                     # [STATIC] Risorse per il sito web
+│   ├── css/
+│   │   └── style.css           # Custom CSS (RTB Cars branding)
+│   ├── js/
+│   │   └── main.js             # Logica JS per il front-end web
+│   └── img/                    # Foto delle auto
+├── core/                       # [BACKEND LOGIC] Il cuore del sistema PHP
+│   ├── Database.php            # Classe per la connessione PDO
+│   ├── Auto.php                # Model: Classe PHP che rappresenta l'entità Auto
+│   └── AutoManager.php         # DAO: Classe con le query SQL (CRUD)
+├── includes/                   # [TEMPLATES] Componenti HTML riutilizzabili
+│   ├── header.php              # Navigazione Bootstrap
+│   └── footer.php              # Footer e script
+├── sql/                        # [DATA] Database e documentazione
+│   └── schema.sql              # Script per la creazione delle tabelle
+├── client_java/                # [JAVA PROJECT] Codice sorgente dell'app Admin
+│   ├── src/                    # Package java (model, view, controller, network)
+│   └── lib/                    # Librerie esterne (es. Gson per il JSON)
+└── index.php                   # [VIEW] La vetrina pubblica del sito RTB Cars
