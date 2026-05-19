@@ -18,15 +18,71 @@ class Auto {
         public string $modello,
         public int $prezzo,
         public int $chilometraggio,
-        public DateTime $immatricolazione, // Mese/Anno come su AutoScout
+        public DateTime $immatricolazione,
         public Carburante $carburante,
-        public int $potenzaCv,             // Filtro CV/kW molto usato
+        public int $potenzaCv,
         public string $colore,
         public bool $garanzia,
-        public array $optional = [],       // Es: ['Sensori', 'CarPlay', 'LED']
+        public array $optional = [],
         public int $porte = 5,
-        public TipoVenditore $tipoVenditore
+        public TipoVenditore $tipoVenditore = TipoVenditore::Concessionario,
+        public ?int $id = null,
+        public ?DateTime $createdAt = null,
+        public ?DateTime $updatedAt = null
     ) {}
+
+    public static function fromArray(array $data): self
+    {
+        $optional = $data['optional'] ?? [];
+        if (is_string($optional)) {
+            $decoded = json_decode($optional, true);
+            $optional = is_array($decoded) ? $decoded : [];
+        }
+
+        return new self(
+            marca: (string) ($data['marca'] ?? ''),
+            modello: (string) ($data['modello'] ?? ''),
+            prezzo: (int) ($data['prezzo'] ?? 0),
+            chilometraggio: (int) ($data['chilometraggio'] ?? 0),
+            immatricolazione: new DateTime((string) ($data['immatricolazione'] ?? 'now')),
+            carburante: Carburante::from((string) ($data['carburante'] ?? Carburante::Benzina->value)),
+            potenzaCv: (int) ($data['potenza_cv'] ?? $data['potenzaCv'] ?? 0),
+            colore: (string) ($data['colore'] ?? ''),
+            garanzia: filter_var($data['garanzia'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            optional: $optional,
+            porte: (int) ($data['porte'] ?? 5),
+            tipoVenditore: TipoVenditore::from((string) ($data['tipo_venditore'] ?? $data['tipoVenditore'] ?? TipoVenditore::Concessionario->value)),
+            id: isset($data['id']) ? (int) $data['id'] : null,
+            createdAt: isset($data['created_at']) ? new DateTime((string) $data['created_at']) : null,
+            updatedAt: isset($data['updated_at']) ? new DateTime((string) $data['updated_at']) : null
+        );
+    }
+
+    public function toArray(bool $includeMetadata = true): array
+    {
+        $data = [
+            'marca' => $this->marca,
+            'modello' => $this->modello,
+            'prezzo' => $this->prezzo,
+            'chilometraggio' => $this->chilometraggio,
+            'immatricolazione' => $this->immatricolazione->format('Y-m-d'),
+            'carburante' => $this->carburante->value,
+            'potenza_cv' => $this->potenzaCv,
+            'colore' => $this->colore,
+            'garanzia' => $this->garanzia,
+            'optional' => $this->optional,
+            'porte' => $this->porte,
+            'tipo_venditore' => $this->tipoVenditore->value,
+        ];
+
+        if ($includeMetadata) {
+            $data['id'] = $this->id;
+            $data['created_at'] = $this->createdAt?->format(DateTimeInterface::ATOM);
+            $data['updated_at'] = $this->updatedAt?->format(DateTimeInterface::ATOM);
+        }
+
+        return $data;
+    }
 
     public function getMarca(): string
     {
