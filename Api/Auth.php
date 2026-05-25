@@ -7,24 +7,50 @@ require_once __DIR__ . '/../Core/UserManager.php';
 require_once __DIR__ . '/../Core/AdminManager.php';
 
 header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: http://rtbcars.altervista.org');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Accept');
 
-function sendJson(mixed $data, int $statusCode = 200): void
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+function sendJson($data, int $statusCode = 200): void
 {
     http_response_code($statusCode);
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
-function readJsonBody(): array
+function readRequestBody(): array
 {
     $rawBody = file_get_contents('php://input');
-    $data = json_decode($rawBody ?: '{}', true);
+    $contentType = strtolower((string) ($_SERVER['CONTENT_TYPE'] ?? ''));
 
-    if (!is_array($data)) {
-        sendJson(['error' => 'JSON non valido.'], 400);
+    if (strpos($contentType, 'application/json') !== false) {
+        $data = json_decode($rawBody ?: '{}', true);
+
+        return is_array($data) ? $data : [];
     }
 
-    return $data;
+    if ($_POST !== []) {
+        return $_POST;
+    }
+
+    parse_str($rawBody, $data);
+
+    return is_array($data) ? $data : [];
+}
+
+function readRequestData(): array
+{
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+        return $_GET;
+    }
+
+    return readRequestBody();
 }
 
 try {
@@ -35,7 +61,7 @@ try {
     $action = $_GET['action'] ?? null;
 
     if ($method === 'POST' && $action === 'register') {
-        $utente = $manager->register(readJsonBody());
+        $utente = $manager->register(readRequestBody());
         $_SESSION['utente_id'] = $utente['id'];
 
         sendJson([
@@ -45,54 +71,51 @@ try {
     }
 
     if ($method === 'POST' && $action === 'login') {
-        $data = readJsonBody();
+        $data = readRequestBody();
         $email = (string) ($data['email'] ?? '');
         $password = (string) ($data['password'] ?? '');
 
         if ($email === '' || $password === '') {
-            sendJson(['error' => 'Email e password sono obbligatorie.'], 422);
+            sendJson(['authenticated' => false], 422);
         }
 
         $utente = $manager->login($email, $password);
         if ($utente === null) {
-            sendJson(['error' => 'Credenziali non valide.'], 401);
+            sendJson(['authenticated' => false], 401);
         }
 
         $_SESSION['utente_id'] = $utente['id'];
 
-        sendJson([
-            'message' => 'Login completato.',
-            'utente' => $utente,
-        ]);
+        sendJson(['authenticated' => true]);
     }
 
 
-    if ($method === 'POST' && $action === 'admin_login') {
-        $data = readJsonBody();
+    if (
+        ($method === 'POST' && ($action === 'admin_login' || $action === null))
+        || ($method === 'GET' && $action === null && isset($_GET['username'], $_GET['password']))
+    ) {
+        $data = readRequestData();
         $username = (string) ($data['username'] ?? $data['nome_utente'] ?? '');
         $password = (string) ($data['password'] ?? '');
 
         if (trim($username) === '' || $password === '') {
-            sendJson(['error' => 'Nome utente e password sono obbligatori.'], 422);
+            sendJson(['authenticated' => false], 422);
         }
 
         $admin = $adminManager->login($username, $password);
         if ($admin === null) {
-            sendJson(['error' => 'Credenziali admin non valide.'], 401);
+            sendJson(['authenticated' => false], 401);
         }
 
         $_SESSION['admin_id'] = $admin['id'];
 
-        sendJson([
-            'message' => 'Login admin completato.',
-            'admin' => $admin,
-        ]);
+        sendJson(['authenticated' => true]);
     }
 
     if ($method === 'POST' && $action === 'admin_logout') {
         unset($_SESSION['admin_id']);
 
-        sendJson(['message' => 'Logout admin completato.']);
+        sendJson(['authenticated' => false]);
     }
 
     if ($method === 'GET' && $action === 'admin_me') {
@@ -106,17 +129,14 @@ try {
             sendJson(['authenticated' => false], 401);
         }
 
-        sendJson([
-            'authenticated' => true,
-            'admin' => $admin,
-        ]);
+        sendJson(['authenticated' => true]);
     }
 
     if ($method === 'POST' && $action === 'logout') {
         $_SESSION = [];
         session_destroy();
 
-        sendJson(['message' => 'Logout completato.']);
+        sendJson(['authenticated' => false]);
     }
 
     if ($method === 'GET' && $action === 'me') {
@@ -131,17 +151,14 @@ try {
             sendJson(['authenticated' => false], 401);
         }
 
-        sendJson([
-            'authenticated' => true,
-            'utente' => $utente,
-        ]);
+        sendJson(['authenticated' => true]);
     }
 
     header('Allow: GET, POST');
-    sendJson(['error' => 'Azione non valida. Usa action=register, login, logout, me, admin_login, admin_logout o admin_me.'], 404);
+    sendJson(['authenticated' => false], 404);
 } catch (InvalidArgumentException $exception) {
-    sendJson(['error' => $exception->getMessage()], 422);
+    sendJson(['authenticated' => false], 422);
 } catch (PDOException $exception) {
-    sendJson(['error' => 'Errore database.', 'detail' => $exception->getMessage()], 500);
+    sendJson(['authenticated' => false], 500);
 }
 ?>

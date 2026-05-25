@@ -45,11 +45,11 @@ CREATE TABLE IF NOT EXISTS utenti (
 
 CREATE TABLE IF NOT EXISTS admin_user (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nome_utente VARCHAR(100) NOT NULL,
+    username VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_admin_user_nome_utente (nome_utente)
+    UNIQUE KEY uq_use_admin_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS cart (
