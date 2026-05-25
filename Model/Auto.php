@@ -26,6 +26,7 @@ class Auto {
         public array $optional = [],
         public int $porte = 5,
         public TipoVenditore $tipoVenditore = TipoVenditore::Concessionario,
+        public ?array $immagini = null,
         public ?int $id = null,
         public ?DateTime $createdAt = null,
         public ?DateTime $updatedAt = null
@@ -38,6 +39,8 @@ class Auto {
             $decoded = json_decode($optional, true);
             $optional = is_array($decoded) ? $decoded : [];
         }
+
+        $immagini = self::normalizeImmagini($data);
 
         return new self(
             marca: (string) ($data['marca'] ?? ''),
@@ -52,6 +55,7 @@ class Auto {
             optional: $optional,
             porte: (int) ($data['porte'] ?? 5),
             tipoVenditore: TipoVenditore::from((string) ($data['tipo_venditore'] ?? $data['tipoVenditore'] ?? TipoVenditore::Concessionario->value)),
+            immagini: $immagini,
             id: isset($data['id']) ? (int) $data['id'] : null,
             createdAt: isset($data['created_at']) ? new DateTime((string) $data['created_at']) : null,
             updatedAt: isset($data['updated_at']) ? new DateTime((string) $data['updated_at']) : null
@@ -69,6 +73,8 @@ class Auto {
             'carburante' => $this->carburante->value,
             'potenza_cv' => $this->potenzaCv,
             'colore' => $this->colore,
+            'immagine_url' => $this->getCoverImageUrl(),
+            'immagini' => $this->immagini ?? [],
             'garanzia' => $this->garanzia,
             'optional' => $this->optional,
             'porte' => $this->porte,
@@ -214,6 +220,89 @@ class Auto {
     {
         $this->tipoVenditore = $tipoVenditore;
         return $this;
+    }
+
+    public function getImmagini(): ?array
+    {
+        return $this->immagini;
+    }
+
+    public function setImmagini(?array $immagini): self
+    {
+        $this->immagini = $immagini;
+        return $this;
+    }
+
+    public function getCoverImageUrl(): ?string
+    {
+        foreach ($this->immagini ?? [] as $immagine) {
+            if (!empty($immagine['is_cover'])) {
+                return $immagine['image_url'];
+            }
+        }
+
+        return $this->immagini[0]['image_url'] ?? null;
+    }
+
+    private static function normalizeImmagini(array $data): ?array
+    {
+        if (array_key_exists('immagini', $data)) {
+            $immagini = $data['immagini'];
+
+            if (!is_array($immagini)) {
+                return [];
+            }
+
+            return array_values(array_filter(array_map(
+                fn (mixed $immagine): ?array => self::normalizeImmagine($immagine),
+                $immagini
+            )));
+        }
+
+        $imageUrl = $data['immagine_url'] ?? $data['immagineUrl'] ?? null;
+        if ($imageUrl !== null && trim((string) $imageUrl) !== '') {
+            return [[
+                'image_url' => trim((string) $imageUrl),
+                'is_cover' => true,
+            ]];
+        }
+
+        return null;
+    }
+
+    private static function normalizeImmagine(mixed $immagine): ?array
+    {
+        if (is_string($immagine)) {
+            $imageUrl = trim($immagine);
+            return $imageUrl === '' ? null : [
+                'image_url' => $imageUrl,
+                'is_cover' => false,
+            ];
+        }
+
+        if (!is_array($immagine)) {
+            return null;
+        }
+
+        $imageUrl = trim((string) ($immagine['image_url'] ?? $immagine['immagine_url'] ?? $immagine['url'] ?? ''));
+        if ($imageUrl === '') {
+            return null;
+        }
+
+        $normalized = [
+            'image_url' => $imageUrl,
+            'is_cover' => filter_var($immagine['is_cover'] ?? $immagine['cover'] ?? false, FILTER_VALIDATE_BOOLEAN),
+        ];
+
+        if (isset($immagine['id'])) {
+            $normalized['id'] = (int) $immagine['id'];
+        }
+
+        if (isset($immagine['created_at'])) {
+            $normalized['created_at'] = (string) $immagine['created_at'];
+        }
+
+        return $normalized;
     }
 }
 ?>

@@ -4,6 +4,7 @@ session_start();
 
 require_once __DIR__ . '/../Core/Database.php';
 require_once __DIR__ . '/../Core/UserManager.php';
+require_once __DIR__ . '/../Core/AdminManager.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -27,7 +28,9 @@ function readJsonBody(): array
 }
 
 try {
-    $manager = new UserManager(Database::getConnection());
+    $pdo = Database::getConnection();
+    $manager = new UserManager($pdo);
+    $adminManager = new AdminManager($pdo);
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $action = $_GET['action'] ?? null;
 
@@ -63,6 +66,52 @@ try {
         ]);
     }
 
+
+    if ($method === 'POST' && $action === 'admin_login') {
+        $data = readJsonBody();
+        $username = (string) ($data['username'] ?? $data['nome_utente'] ?? '');
+        $password = (string) ($data['password'] ?? '');
+
+        if (trim($username) === '' || $password === '') {
+            sendJson(['error' => 'Nome utente e password sono obbligatori.'], 422);
+        }
+
+        $admin = $adminManager->login($username, $password);
+        if ($admin === null) {
+            sendJson(['error' => 'Credenziali admin non valide.'], 401);
+        }
+
+        $_SESSION['admin_id'] = $admin['id'];
+
+        sendJson([
+            'message' => 'Login admin completato.',
+            'admin' => $admin,
+        ]);
+    }
+
+    if ($method === 'POST' && $action === 'admin_logout') {
+        unset($_SESSION['admin_id']);
+
+        sendJson(['message' => 'Logout admin completato.']);
+    }
+
+    if ($method === 'GET' && $action === 'admin_me') {
+        if (!isset($_SESSION['admin_id'])) {
+            sendJson(['authenticated' => false], 401);
+        }
+
+        $admin = $adminManager->getById((int) $_SESSION['admin_id']);
+        if ($admin === null) {
+            unset($_SESSION['admin_id']);
+            sendJson(['authenticated' => false], 401);
+        }
+
+        sendJson([
+            'authenticated' => true,
+            'admin' => $admin,
+        ]);
+    }
+
     if ($method === 'POST' && $action === 'logout') {
         $_SESSION = [];
         session_destroy();
@@ -89,7 +138,7 @@ try {
     }
 
     header('Allow: GET, POST');
-    sendJson(['error' => 'Azione non valida. Usa action=register, login, logout o me.'], 404);
+    sendJson(['error' => 'Azione non valida. Usa action=register, login, logout, me, admin_login, admin_logout o admin_me.'], 404);
 } catch (InvalidArgumentException $exception) {
     sendJson(['error' => $exception->getMessage()], 422);
 } catch (PDOException $exception) {

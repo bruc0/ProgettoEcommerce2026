@@ -37,6 +37,29 @@ function getRequestId(): ?int
     return $id !== '' && ctype_digit($id) ? (int) $id : null;
 }
 
+
+function getAutoFilters(): array
+{
+    $allowedFilters = [
+        'q',
+        'marca',
+        'modello',
+        'colore',
+        'carburante',
+        'tipo_venditore',
+        'porte',
+        'garanzia',
+        'min_prezzo',
+        'max_prezzo',
+        'min_chilometraggio',
+        'max_chilometraggio',
+        'min_potenza_cv',
+        'max_potenza_cv',
+    ];
+
+    return array_intersect_key($_GET, array_flip($allowedFilters));
+}
+
 function autoFromRequest(array $data): Auto
 {
     $requiredFields = [
@@ -82,7 +105,7 @@ try {
                     : sendJson($auto);
             }
 
-            sendJson($manager->getAll());
+            sendJson($manager->getAll(getAutoFilters()));
 
         case 'POST':
             $created = $manager->create(autoFromRequest(readJsonBody()));

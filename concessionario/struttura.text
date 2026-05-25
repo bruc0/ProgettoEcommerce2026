@@ -1,0 +1,18 @@
+/concessionario
+│
+├── database.sql
+├── config.php
+├── header.php
+├── footer.php
+├── index.php
+├── register.php
+├── login.php
+├── logout.php
+├── cart.php
+├── add_to_cart.php
+├── remove_from_cart.php
+├── checkout.php
+├── order_history.php
+├── css/
+│   └── styles.css (già fornito da Bootstrap)
+└── assets/ (immagini auto)

@@ -1,4 +1,4 @@
-<?
-echo "ciao";
-
+<?php
+header('Location: concessionario/index.php');
+exit;
 ?>
