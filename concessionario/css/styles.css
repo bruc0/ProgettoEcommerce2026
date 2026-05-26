@@ -1,0 +1,75 @@
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    background: #f4f6f8;
+    color: #1f2933;
+}
+
+main.container {
+    min-height: calc(100vh - 154px);
+}
+
+.site-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.page-title {
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.filter-sidebar {
+    position: sticky;
+    top: 5.5rem;
+}
+
+.car-card {
+    border: 0;
+    overflow: hidden;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.car-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.75rem 1.75rem rgba(15, 23, 42, 0.12) !important;
+}
+
+.car-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    background: #e9ecef;
+}
+
+.price-badge {
+    font-size: 1.1rem;
+    color: #198754;
+    font-weight: 700;
+}
+
+.auth-card,
+.content-card {
+    border: 0;
+    border-radius: 0.5rem;
+}
+
+.table thead th {
+    white-space: nowrap;
+}
+
+.empty-state {
+    border: 1px dashed #ced4da;
+    background: #fff;
+}
+
+@media (max-width: 767.98px) {
+    .filter-sidebar {
+        position: static;
+    }
+
+    .car-card .card-img-top {
+        height: 180px;
+    }
+}

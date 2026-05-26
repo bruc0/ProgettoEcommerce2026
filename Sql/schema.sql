@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS admin_user (
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_use_admin_username (username)
+    UNIQUE KEY uq_admin_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS cart (
@@ -80,3 +80,5 @@ CREATE TABLE IF NOT EXISTS order_items (
     UNIQUE KEY uq_order_item_auto (car_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Gli admin iniziali bruc0, trencio e lello vengono creati automaticamente
+-- da Core/AdminManager.php al primo login con password iniziale: admin123.

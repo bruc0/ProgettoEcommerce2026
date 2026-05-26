@@ -26,33 +26,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 include 'header.php';
 ?>
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2>Registrazione</h2>
-        <?php if(isset($error)) echo "<div class='alert alert-danger'>" . htmlspecialchars($error) . "</div>"; ?>
-        <form method="post">
-            <div class="mb-3">
-                <label>Nome</label>
-                <input type="text" name="nome" class="form-control" required>
+    <div class="col-lg-7">
+        <div class="card auth-card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-plus display-5 text-primary"></i>
+                    <h1 class="h3 mt-3 mb-1">Registrazione</h1>
+                    <p class="text-muted mb-0">Crea il tuo account per salvare il carrello e acquistare.</p>
+                </div>
+                <?php if(isset($error)): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input id="nome" type="text" name="nome" class="form-control" autocomplete="given-name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cognome" class="form-label">Cognome</label>
+                            <input id="cognome" type="text" name="cognome" class="form-control" autocomplete="family-name" required>
+                        </div>
+                        <div class="col-md-7">
+                            <label for="email" class="form-label">Email</label>
+                            <input id="email" type="email" name="email" class="form-control" autocomplete="email" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="telefono" class="form-label">Telefono</label>
+                            <input id="telefono" type="text" name="telefono" class="form-control" autocomplete="tel">
+                        </div>
+                        <div class="col-12">
+                            <label for="password" class="form-label">Password</label>
+                            <input id="password" type="password" name="password" class="form-control" minlength="8" autocomplete="new-password" required>
+                            <div class="form-text">Minimo 8 caratteri.</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-4">Registrati</button>
+                </form>
+                <p class="text-center text-muted mt-4 mb-0">Hai già un account? <a href="login.php">Accedi</a></p>
             </div>
-            <div class="mb-3">
-                <label>Cognome</label>
-                <input type="text" name="cognome" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" minlength="8" required>
-            </div>
-            <div class="mb-3">
-                <label>Telefono</label>
-                <input type="text" name="telefono" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-primary">Registrati</button>
-        </form>
-        <p class="mt-3">Hai già un account? <a href="login.php">Accedi</a></p>
+        </div>
     </div>
 </div>
 <?php include 'footer.php'; ?>

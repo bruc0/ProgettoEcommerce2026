@@ -1,6 +1,6 @@
 /concessionario
+# Schema SQL unico: ../Sql/schema.sql
 │
-├── database.sql
 ├── config.php
 ├── header.php
 ├── footer.php

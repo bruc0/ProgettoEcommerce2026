@@ -12,27 +12,56 @@ $total = array_sum(array_column($cartItems, 'prezzo'));
 
 include 'header.php';
 ?>
-<h2>Il mio carrello</h2>
-<?php if(count($cartItems) > 0): ?>
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead>
-                <tr><th>Auto</th><th>Prezzo</th><th>Azione</th></tr>
-            </thead>
-            <tbody>
-                <?php foreach($cartItems as $item): ?>
-                <tr>
-                    <td><?= htmlspecialchars($item['marca'] . ' ' . $item['modello'] . ' (' . date('Y', strtotime($item['immatricolazione'])) . ')') ?></td>
-                    <td><?= number_format((float) $item['prezzo'], 2, ',', '.') ?> €</td>
-                    <td><a href="remove_from_cart.php?car_id=<?= $item['car_id'] ?>" class="btn btn-danger btn-sm">Rimuovi</a></td>
-                </tr>
-                <?php endforeach; ?>
-                <tr class="fw-bold"><td>Totale</td><td colspan="2"><?= number_format((float) $total, 2, ',', '.') ?> €</td></tr>
-            </tbody>
-        </table>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="page-title h2 mb-1">Il mio carrello</h1>
+        <p class="text-muted mb-0">Controlla le auto selezionate prima di procedere all'acquisto.</p>
     </div>
-    <a href="checkout.php" class="btn btn-success">Procedi all'acquisto</a>
+    <a href="index.php" class="btn btn-outline-primary"><i class="bi bi-arrow-left me-1"></i>Torna al catalogo</a>
+</div>
+
+<?php if(count($cartItems) > 0): ?>
+    <div class="card content-card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Auto</th>
+                            <th>Dettagli</th>
+                            <th class="text-end">Prezzo</th>
+                            <th class="text-end">Azione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($cartItems as $item): ?>
+                            <tr>
+                                <td class="fw-semibold"><?= htmlspecialchars($item['marca'] . ' ' . $item['modello']) ?></td>
+                                <td class="text-muted small"><?= date('Y', strtotime($item['immatricolazione'])) ?> · <?= number_format((float) $item['chilometraggio'], 0, ',', '.') ?> km · <?= htmlspecialchars($item['carburante']) ?></td>
+                                <td class="text-end fw-semibold"><?= number_format((float) $item['prezzo'], 2, ',', '.') ?> €</td>
+                                <td class="text-end"><a href="remove_from_cart.php?car_id=<?= $item['car_id'] ?>" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>Rimuovi</a></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="2" class="fw-bold">Totale</td>
+                            <td colspan="2" class="text-end fw-bold"><?= number_format((float) $total, 2, ',', '.') ?> €</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mt-4">
+        <a href="checkout.php" class="btn btn-success btn-lg"><i class="bi bi-check2-circle me-1"></i>Procedi all'acquisto</a>
+    </div>
 <?php else: ?>
-    <p>Carrello vuoto. <a href="index.php">Vai al catalogo</a></p>
+    <div class="empty-state rounded-3 p-5 text-center">
+        <i class="bi bi-cart-x display-5 text-muted"></i>
+        <h2 class="h4 mt-3">Carrello vuoto</h2>
+        <p class="text-muted mb-4">Aggiungi una vettura dal catalogo per iniziare l'acquisto.</p>
+        <a href="index.php" class="btn btn-primary">Vai al catalogo</a>
+    </div>
 <?php endif; ?>
 <?php include 'footer.php'; ?>

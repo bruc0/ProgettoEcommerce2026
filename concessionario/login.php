@@ -18,21 +18,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 include 'header.php';
 ?>
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2>Accesso</h2>
-        <?php if(isset($_GET['registered'])) echo "<div class='alert alert-success'>Registrazione completata! Accedi.</div>"; ?>
-        <?php if(isset($error)) echo "<div class='alert alert-danger'>" . htmlspecialchars($error) . "</div>"; ?>
-        <form method="post">
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" required>
+    <div class="col-md-8 col-lg-5">
+        <div class="card auth-card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-circle display-5 text-primary"></i>
+                    <h1 class="h3 mt-3 mb-1">Accesso</h1>
+                    <p class="text-muted mb-0">Accedi per acquistare e gestire il carrello.</p>
+                </div>
+                <?php if(isset($_GET['registered'])): ?>
+                    <div class="alert alert-success">Registrazione completata! Accedi.</div>
+                <?php endif; ?>
+                <?php if(isset($error)): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input id="email" type="email" name="email" class="form-control" autocomplete="email" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <input id="password" type="password" name="password" class="form-control" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Accedi</button>
+                </form>
+                <p class="text-center text-muted mt-4 mb-0">Non hai un account? <a href="register.php">Registrati</a></p>
             </div>
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Accedi</button>
-        </form>
+        </div>
     </div>
 </div>
 <?php include 'footer.php'; ?>

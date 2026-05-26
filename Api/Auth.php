@@ -76,12 +76,12 @@ try {
         $password = (string) ($data['password'] ?? '');
 
         if ($email === '' || $password === '') {
-            sendJson(['authenticated' => false], 422);
+            sendJson(['authenticated' => false]);
         }
 
         $utente = $manager->login($email, $password);
         if ($utente === null) {
-            sendJson(['authenticated' => false], 401);
+            sendJson(['authenticated' => false]);
         }
 
         $_SESSION['utente_id'] = $utente['id'];
@@ -99,12 +99,12 @@ try {
         $password = (string) ($data['password'] ?? '');
 
         if (trim($username) === '' || $password === '') {
-            sendJson(['authenticated' => false], 422);
+            sendJson(['authenticated' => false]);
         }
 
         $admin = $adminManager->login($username, $password);
         if ($admin === null) {
-            sendJson(['authenticated' => false], 401);
+            sendJson(['authenticated' => false]);
         }
 
         $_SESSION['admin_id'] = $admin['id'];
@@ -120,13 +120,13 @@ try {
 
     if ($method === 'GET' && $action === 'admin_me') {
         if (!isset($_SESSION['admin_id'])) {
-            sendJson(['authenticated' => false], 401);
+            sendJson(['authenticated' => false]);
         }
 
         $admin = $adminManager->getById((int) $_SESSION['admin_id']);
         if ($admin === null) {
             unset($_SESSION['admin_id']);
-            sendJson(['authenticated' => false], 401);
+            sendJson(['authenticated' => false]);
         }
 
         sendJson(['authenticated' => true]);
@@ -141,24 +141,24 @@ try {
 
     if ($method === 'GET' && $action === 'me') {
         if (!isset($_SESSION['utente_id'])) {
-            sendJson(['authenticated' => false], 401);
+            sendJson(['authenticated' => false]);
         }
 
         $utente = $manager->getById((int) $_SESSION['utente_id']);
         if ($utente === null) {
             $_SESSION = [];
             session_destroy();
-            sendJson(['authenticated' => false], 401);
+            sendJson(['authenticated' => false]);
         }
 
         sendJson(['authenticated' => true]);
     }
 
     header('Allow: GET, POST');
-    sendJson(['authenticated' => false], 404);
+    sendJson(['authenticated' => false]);
 } catch (InvalidArgumentException $exception) {
-    sendJson(['authenticated' => false], 422);
+    sendJson(['authenticated' => false]);
 } catch (PDOException $exception) {
-    sendJson(['authenticated' => false], 500);
+    sendJson(['authenticated' => false]);
 }
 ?>
