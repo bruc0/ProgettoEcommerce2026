@@ -5,10 +5,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cognome = trim($_POST['cognome']);
     $email = strtolower(trim($_POST['email']));
     $passwordPlain = $_POST['password'];
+    $passwordConfirm = $_POST['password_confirm'] ?? '';
     $telefono = trim($_POST['telefono'] ?? '');
 
-    if ($nome === '' || $cognome === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($passwordPlain) < 8) {
-        $error = "Compila tutti i campi. La password deve avere almeno 8 caratteri.";
+    if ($nome === '' || $cognome === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Compila nome, cognome e una email valida.";
+    } elseif (strlen($passwordPlain) < 8) {
+        $error = "La password deve avere almeno 8 caratteri.";
+    } elseif ($passwordPlain !== $passwordConfirm) {
+        $error = "Le password non coincidono.";
     }
 
     try {
@@ -55,10 +60,14 @@ include 'header.php';
                             <label for="telefono" class="form-label">Telefono</label>
                             <input id="telefono" type="text" name="telefono" class="form-control" autocomplete="tel">
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label for="password" class="form-label">Password</label>
                             <input id="password" type="password" name="password" class="form-control" minlength="8" autocomplete="new-password" required>
                             <div class="form-text">Minimo 8 caratteri.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password_confirm" class="form-label">Conferma password</label>
+                            <input id="password_confirm" type="password" name="password_confirm" class="form-control" minlength="8" autocomplete="new-password" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 mt-4">Registrati</button>

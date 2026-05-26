@@ -29,6 +29,9 @@ include 'header.php';
                 <?php if(isset($_GET['registered'])): ?>
                     <div class="alert alert-success">Registrazione completata! Accedi.</div>
                 <?php endif; ?>
+                <?php if(isset($_GET['reset'])): ?>
+                    <div class="alert alert-success">Password aggiornata. Accedi con le nuove credenziali.</div>
+                <?php endif; ?>
                 <?php if(isset($error)): ?>
                     <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
@@ -37,8 +40,11 @@ include 'header.php';
                         <label for="email" class="form-label">Email</label>
                         <input id="email" type="email" name="email" class="form-control" autocomplete="email" required>
                     </div>
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Password</label>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="password" class="form-label">Password</label>
+                            <a href="forgot_password.php" class="small">Password dimenticata?</a>
+                        </div>
                         <input id="password" type="password" name="password" class="form-control" autocomplete="current-password" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Accedi</button>
